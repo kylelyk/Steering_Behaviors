@@ -4,6 +4,7 @@ package {
 	import flash.display.BitmapData;
 	import flash.display.Sprite;
 	import flash.events.Event;
+	import flash.events.KeyboardEvent;
 	import flash.events.MouseEvent;
 	import flash.events.TimerEvent;
 	import flash.geom.Point;
@@ -32,6 +33,9 @@ package {
 		private var vehicleManager:VehicleManager;
 		private var timer:Timer;
 		
+		private var leftKey:OneKeyManager;
+		private var rightKey:OneKeyManager;
+		private var enterKey:OneKeyManager;
 		private var clicked:Boolean = false;
 		private var rand:Object;
 		//private var hitTarget:Boolean;
@@ -42,8 +46,12 @@ package {
 		//private const DEMO:String = "WANDER";
 		//private const DEMO:String = "PURSUE&EVADE";
 		//private const DEMO:String = "ARRIVE";
-		private const DEMO:String = "SEPARATE";
+		//private const DEMO:String = "SEPARATE";
 		//private const DEMO:String = "QUADTREE";
+		private const DEMOARRAY:Array = ["SEEK&FLEE", "WANDER", "PURSUE&EVADE", "ARRIVE", "SEPARATE"]
+		
+		private var curDemo:String = DEMOARRAY[0];
+		private var curIndex:uint = 0;
 		
 		public function Main():void {
 			if (stage) {
@@ -64,100 +72,10 @@ package {
 				return;
 			}
 			
-			if (DEMO == "SEEK&FLEE") {
-				var randPos:Vector2D = new Vector2D(Math.random() * (stage.stageWidth - 100) + 50, Math.random() * (stage.stageHeight - 100) + 50);
-				var randVel:Vector2D = Vector2D.createVector2DFromAngle(Math.random() * Math.PI * 2, Math.random() * 10);
-				var randTarget:Vector2D = new Vector2D(Math.random() * (stage.stageWidth - 100) + 50, Math.random() * (stage.stageHeight - 100) + 50);
-				
-				rand = {pos: randPos, vel: randVel, target: randTarget}
-				
-				vehicle1 = new Vehicle(randPos, randVel);
-				vehicle1.maxAccel = 0.25;
-				vehicle1.maxVel = 10;
-				vehicle1.changeBehavior("seek", [randTarget]);
-				addChild(vehicle1);
-				
-				vehicle2 = new Vehicle(randPos.clone(), randVel.clone());
-				vehicle2.maxAccel = 0.5;
-				vehicle2.maxVel = 10;
-				vehicle2.changeBehavior("flee", [randTarget]);
-				addChild(vehicle2);
-				
-				graphics.beginFill(0);
-				graphics.drawCircle(randTarget.x, randTarget.y, 2);
-				graphics.endFill();
-				
-				//hitTarget = false;
-				
-				vehicle1.addEventListener("seek", seekListener);
-				stage.addEventListener(MouseEvent.CLICK, mouseClicked);
-			} else if (DEMO == "WANDER") {
-				vehicle1 = new Vehicle(new Vector2D(stage.stageWidth / 2, stage.stageHeight / 2));
-				vehicle1.maxAccel = 0.25;
-				vehicle1.maxVel = 3;
-				vehicle1.changeBehavior("wander", []);
-				addChild(vehicle1);
-			} else if (DEMO == "PURSUE&EVADE") {
-				
-				randPos = new Vector2D(Math.random() * (stage.stageWidth - 100) + 50, Math.random() * (stage.stageHeight - 100) + 50);
-				randVel = Vector2D.createVector2DFromAngle(Math.random() * Math.PI * 2, Math.random() * 7);
-				trace("angle: " + randVel.angle)
-				vehicle3 = new Vehicle(randPos, randVel);
-				vehicle3.maxAccel = 0.5;
-				vehicle3.maxVel = 6;
-				addChild(vehicle3);
-				
-				randPos = new Vector2D(Math.random() * (stage.stageWidth - 100) + 50, Math.random() * (stage.stageHeight - 100) + 50);
-				randVel = Vector2D.createVector2DFromAngle(Math.random() * Math.PI * 2, Math.random() * 10);
-				
-				vehicle1 = new Vehicle(randPos, randVel);
-				vehicle1.maxAccel = 0.5;
-				vehicle1.maxVel = 20;
-				vehicle1.changeBehavior("pursue", [vehicle3]);
-				addChild(vehicle1);
-				
-				vehicle2 = new Vehicle(randPos.clone(), randVel.clone());
-				vehicle2.maxAccel = 0.5;
-				vehicle2.maxVel = 10;
-				vehicle2.changeBehavior("evade", [vehicle3]);
-				addChild(vehicle2);
-				
-				vehicle1.addEventListener("pursue", pursueListener);
-			} else if (DEMO == "ARRIVE") {
-				randPos = new Vector2D(Math.random() * (stage.stageWidth - 100) + 50, Math.random() * (stage.stageHeight - 100) + 50);
-				randVel = Vector2D.createVector2DFromAngle(Math.random() * Math.PI * 2, Math.random() * 10);
-				randTarget = new Vector2D(Math.random() * (stage.stageWidth - 100) + 50, Math.random() * (stage.stageHeight - 100) + 50);
-				
-				vehicle1 = new Vehicle(randPos, randVel);
-				vehicle1.maxAccel = 0.5;
-				vehicle1.maxVel = 10;
-				vehicle1.changeBehavior("arrive", [randTarget]);
-				addChild(vehicle1);
-				vehicle1.addEventListener("arrive", arriveListener);
-				
-				graphics.beginFill(0);
-				graphics.drawCircle(randTarget.x, randTarget.y, 2);
-				graphics.endFill();
-			} else if (DEMO == "SEPARATE") {
-				vehicleManager = new VehicleManager();
-				for (var i:uint = 0; i < 50; i++) {
-					var veh:Vehicle = new Vehicle(new Vector2D(Math.random() * (stage.stageWidth - 100) + 50, Math.random() * (stage.stageHeight - 100) + 50), Vector2D.createVector2DFromAngle(Math.random() * Math.PI * 2, Math.random() * 10));
-					vehicleManager.addVehicle(veh);
-					veh.changeBehavior("separate", [25, true]);
-					//veh.changeBehavior("random", []);
-					veh.maxAccel = 0.5;
-					veh.maxVel = 10;
-					addChild(veh);
-						//vehicle1.addEventListener("arrive", arriveListener);
-				}
-				
-					//graphics.beginFill(0);
-					//graphics.drawCircle(randTarget.x, randTarget.y, 2);
-					//graphics.endFill();
-				
-			}else if (DEMO == "QUADTREE") {
-				var _instance:QuadTree = new QuadTree(new Rectangle(0, 0, 800, 600));
-			}
+			switchDemo();
+			leftKey = new OneKeyManager(stage, KeyList.LEFT, null, leftDemo);
+			rightKey = new OneKeyManager(stage, KeyList.RIGHT, null, rightDemo);
+			enterKey = new OneKeyManager(stage, KeyList.ENTER, null, switchDemo);
 			
 			stage.addEventListener(Event.ENTER_FRAME, enterFrame);
 			return;
@@ -249,11 +167,11 @@ package {
 		
 		private function pursueListener(e:BehaviorEvent):void {
 			
-			trace("In listener for pursue")
+			//trace("In listener for pursue")
 			
 			//trace("Main recieve event, target is: " + e.target+ " with currentTarget: "+ e.currentTarget);
 			var randPos:Vector2D = new Vector2D(Math.random() * (stage.stageWidth - 100) + 50, Math.random() * (stage.stageHeight - 100) + 50);
-			var randVel:Vector2D = Vector2D.createVector2DFromAngle(Math.random() * Math.PI * 2, Math.random() * vehicle1.maxVel[0]);
+			var randVel:Vector2D = Vector2D.createVector2DFromAngle(Math.random() * Math.PI * 2, Math.random() * vehicle1.maxVel);
 			
 			vehicle1.pos = randPos;
 			vehicle1.vel = randVel;
@@ -262,22 +180,15 @@ package {
 			vehicle2.vel = randVel.clone();
 			
 			randPos = new Vector2D(stage.stageWidth / 2, stage.stageHeight / 2);
-			randVel = Vector2D.createVector2DFromAngle(Math.random() * Math.PI * 2, Math.random() * vehicle3.maxVel[0]);
-			//trace("angle: "+ randVel.angle)	
+			randVel = Vector2D.createVector2DFromAngle(Math.random() * Math.PI * 2, Math.random() * vehicle3.maxVel);
 			vehicle3.pos = randPos;
 			vehicle3.vel = randVel;
 		
-			//vehicle1.run();
-			//vehicle1.update();
-			//graphics.clear();
-			//graphics.beginFill(0);
-			//graphics.drawCircle(randTarget.x, randTarget.y, 2);
-			//graphics.endFill();
 		}
 		
 		private function arriveListener(e:BehaviorEvent):void {
 			
-			trace("In listener for arrive")
+			//trace("In listener for arrive")
 			
 			//trace("Main recieve event, target is: " + e.target+ " with currentTarget: "+ e.currentTarget);
 			var randPos:Vector2D = new Vector2D(Math.random() * (stage.stageWidth - 100) + 50, Math.random() * (stage.stageHeight - 100) + 50);
@@ -294,44 +205,39 @@ package {
 			graphics.endFill();
 		}
 		
-		/*private function mouseUp(e:MouseEvent):void {
-		   mouseIsDown = false;
-		   }
-		
-		   private function mouseDown(e:MouseEvent):void {
-		   mouseIsDown = true;
-		   //obj.deleteVertex(null, 1);
-		 }*/
-		
 		private function mouseClicked(e:MouseEvent):void {
 			clicked = true;
-			//obj.addVertex(new Point(mouseX, mouseY));
 		}
 		
 		private function enterFrame(e:Event):void {
-			//graphics.clear()
-			//graphics.lineStyle(1, 0x0000EE);
-			//graphics.drawCircle(vehicle3.pos.x , vehicle3.pos.y, 5);
 			if (vehicle1) {
 				vehicle1.run();
-				
 				if (vehicle2) {
 					vehicle2.run();
 					if (vehicle3) {
-						//trace("targetVehicle3 pos after: "+ vehicle3.pos+"\n")
 						vehicle3.run();
-						
 						vehicle3.update();
-						
 					}
 					vehicle2.update();
 				}
-				
 				vehicle1.update();
 			}
 			
 			if (vehicleManager) {
 				vehicleManager.simulateAll();
+				if (curDemo == "SEPARATE") {
+					var allStopped:Boolean = true;
+					for (var i:uint = 0; i < vehicleManager.vehicleCount; i++) {
+						if (vehicleManager.getVehicle(i).vel.length != 0) {
+							allStopped = false;
+						}
+					}
+					
+					//refresh
+					if (allStopped) {
+						switchDemo();
+					}
+				}
 			}
 			
 			return;
@@ -377,6 +283,122 @@ package {
 		
 			//testing addVertex function
 			//obj.addVertex(new Point(mouseX, mouseY));
+		}
+		
+		private function switchDemo(e:KeyboardEvent = null):void {
+			graphics.clear();
+			if (vehicle1) {
+				removeChild(vehicle1);
+				vehicle1 = null;
+			}
+			if (vehicle2) {
+				removeChild(vehicle2);
+				vehicle2 = null;
+			}
+			if (vehicle3) {
+				removeChild(vehicle3);
+				vehicle3 = null;
+			}
+			vehicleManager = null;
+			curDemo = DEMOARRAY[curIndex];
+			
+			if (curDemo == "SEEK&FLEE") {
+				var randPos:Vector2D = new Vector2D(Math.random() * (stage.stageWidth - 100) + 50, Math.random() * (stage.stageHeight - 100) + 50);
+				var randVel:Vector2D = Vector2D.createVector2DFromAngle(Math.random() * Math.PI * 2, Math.random() * 10);
+				var randTarget:Vector2D = new Vector2D(Math.random() * (stage.stageWidth - 100) + 50, Math.random() * (stage.stageHeight - 100) + 50);
+				
+				rand = {pos: randPos, vel: randVel, target: randTarget}
+				
+				vehicle1 = new Vehicle(randPos, randVel);
+				vehicle1.maxAccel = 0.25;
+				vehicle1.maxVel = 10;
+				vehicle1.changeBehavior("seek", [randTarget]);
+				addChild(vehicle1);
+				
+				vehicle2 = new Vehicle(randPos.clone(), randVel.clone());
+				vehicle2.maxAccel = 0.5;
+				vehicle2.maxVel = 10;
+				vehicle2.changeBehavior("flee", [randTarget]);
+				addChild(vehicle2);
+				
+				graphics.beginFill(0);
+				graphics.drawCircle(randTarget.x, randTarget.y, 2);
+				graphics.endFill();
+				
+				//hitTarget = false;
+				
+				vehicle1.addEventListener("seek", seekListener);
+				stage.addEventListener(MouseEvent.CLICK, mouseClicked);
+			} else if (curDemo == "WANDER") {
+				vehicle1 = new Vehicle(new Vector2D(stage.stageWidth / 2, stage.stageHeight / 2));
+				vehicle1.maxAccel = 0.25;
+				vehicle1.maxVel = 3;
+				vehicle1.changeBehavior("wander", []);
+				addChild(vehicle1);
+			} else if (curDemo == "PURSUE&EVADE") {
+				
+				randPos = new Vector2D(Math.random() * (stage.stageWidth - 100) + 50, Math.random() * (stage.stageHeight - 100) + 50);
+				randVel = Vector2D.createVector2DFromAngle(Math.random() * Math.PI * 2, Math.random() * 7);
+				vehicle3 = new Vehicle(randPos, randVel);
+				vehicle3.maxAccel = 0.5;
+				vehicle3.maxVel = 6;
+				addChild(vehicle3);
+				
+				randPos = new Vector2D(Math.random() * (stage.stageWidth - 100) + 50, Math.random() * (stage.stageHeight - 100) + 50);
+				randVel = Vector2D.createVector2DFromAngle(Math.random() * Math.PI * 2, Math.random() * 10);
+				
+				vehicle1 = new Vehicle(randPos, randVel);
+				vehicle1.maxAccel = 0.5;
+				vehicle1.maxVel = 20;
+				vehicle1.changeBehavior("pursue", [vehicle3]);
+				addChild(vehicle1);
+				
+				vehicle2 = new Vehicle(randPos.clone(), randVel.clone());
+				vehicle2.maxAccel = 0.5;
+				vehicle2.maxVel = 10;
+				vehicle2.changeBehavior("evade", [vehicle3]);
+				addChild(vehicle2);
+				
+				vehicle1.addEventListener("pursue", pursueListener);
+			} else if (curDemo == "ARRIVE") {
+				randPos = new Vector2D(Math.random() * (stage.stageWidth - 100) + 50, Math.random() * (stage.stageHeight - 100) + 50);
+				randVel = Vector2D.createVector2DFromAngle(Math.random() * Math.PI * 2, Math.random() * 10);
+				randTarget = new Vector2D(Math.random() * (stage.stageWidth - 100) + 50, Math.random() * (stage.stageHeight - 100) + 50);
+				
+				vehicle1 = new Vehicle(randPos, randVel);
+				vehicle1.maxAccel = 0.5;
+				vehicle1.maxVel = 10;
+				vehicle1.changeBehavior("arrive", [randTarget]);
+				addChild(vehicle1);
+				vehicle1.addEventListener("arrive", arriveListener);
+				
+				graphics.beginFill(0);
+				graphics.drawCircle(randTarget.x, randTarget.y, 2);
+				graphics.endFill();
+			} else if (curDemo == "SEPARATE") {
+				vehicleManager = new VehicleManager();
+				for (var i:uint = 0; i < 50; i++) {
+					var veh:Vehicle = new Vehicle(new Vector2D(Math.random() * (stage.stageWidth - 100) + 50, Math.random() * (stage.stageHeight - 100) + 50), Vector2D.createVector2DFromAngle(Math.random() * Math.PI * 2, Math.random() * 10));
+					vehicleManager.addVehicle(veh);
+					veh.changeBehavior("separate", [25, true]);
+					veh.maxAccel = 0.5;
+					veh.maxVel = 10;
+					addChild(veh);
+				}
+			} else if (curDemo == "QUADTREE") {
+				//unfinished
+				var _instance:QuadTree = new QuadTree(new Rectangle(0, 0, 800, 600));
+			}
+		}
+		
+		private function rightDemo(e:KeyboardEvent):void {
+			curIndex = Utils.wrap(0, DEMOARRAY.length, curIndex + 1);
+			switchDemo();
+		}
+		
+		private function leftDemo(e:KeyboardEvent):void {
+			curIndex = Utils.wrap(0, DEMOARRAY.length, curIndex - 1);
+			switchDemo();
 		}
 	}
 }
