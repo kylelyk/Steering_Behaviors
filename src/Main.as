@@ -8,6 +8,8 @@ package {
 	import flash.events.MouseEvent;
 	import flash.events.TimerEvent;
 	import flash.geom.Point;
+	import flash.text.TextField;
+	import flash.text.TextFormat;
 	import flash.utils.Timer;
 	import steering.BehaviorEvent;
 	import steering.BehaviorManager;
@@ -39,6 +41,11 @@ package {
 		private var clicked:Boolean = false;
 		private var rand:Object;
 		//private var hitTarget:Boolean;
+		
+		private var textBox:TextField;
+		private var curDemo:String;
+		private var curIndex:uint = 0;
+		
 		//TURN THIS ON FOR AUTOMATIC TESTING
 		private const TESTING:Boolean = false;
 		
@@ -50,8 +57,7 @@ package {
 		//private const DEMO:String = "QUADTREE";
 		private const DEMOARRAY:Array = ["SEEK&FLEE", "WANDER", "PURSUE&EVADE", "ARRIVE", "SEPARATE"]
 		
-		private var curDemo:String = DEMOARRAY[0];
-		private var curIndex:uint = 0;
+
 		
 		public function Main():void {
 			if (stage) {
@@ -72,6 +78,12 @@ package {
 				return;
 			}
 			
+			textBox = new TextField();
+			var format:TextFormat = new TextFormat(null, 20, 0x999999, null, null, null, null, null, "center");
+			addChild(textBox);
+			textBox.defaultTextFormat = format;
+			textBox.width = stage.stageWidth;
+			curDemo = DEMOARRAY[0];
 			switchDemo();
 			leftKey = new OneKeyManager(stage, KeyList.LEFT, null, leftDemo);
 			rightKey = new OneKeyManager(stage, KeyList.RIGHT, null, rightDemo);
@@ -134,6 +146,7 @@ package {
 		private function seekTimer(tEvent:TimerEvent):void {
 			
 			if (clicked) {
+				//debugging
 				var unitVect:Vector2D = rand.target.subtract(rand.pos);
 				trace("PosDiff: " + unitVect.length);
 				
@@ -299,8 +312,16 @@ package {
 				removeChild(vehicle3);
 				vehicle3 = null;
 			}
-			vehicleManager = null;
+			if (vehicleManager) {
+				for (var i:uint = 0; i < vehicleManager.vehicleCount; i++) {
+					removeChild(vehicleManager.getVehicle(i));
+				}
+				vehicleManager = null;
+			}
+			
 			curDemo = DEMOARRAY[curIndex];
+			textBox.text = curDemo + " Behavior";
+			
 			
 			if (curDemo == "SEEK&FLEE") {
 				var randPos:Vector2D = new Vector2D(Math.random() * (stage.stageWidth - 100) + 50, Math.random() * (stage.stageHeight - 100) + 50);
@@ -377,7 +398,7 @@ package {
 				graphics.endFill();
 			} else if (curDemo == "SEPARATE") {
 				vehicleManager = new VehicleManager();
-				for (var i:uint = 0; i < 50; i++) {
+				for (i = 0; i < 150; i++) {
 					var veh:Vehicle = new Vehicle(new Vector2D(Math.random() * (stage.stageWidth - 100) + 50, Math.random() * (stage.stageHeight - 100) + 50), Vector2D.createVector2DFromAngle(Math.random() * Math.PI * 2, Math.random() * 10));
 					vehicleManager.addVehicle(veh);
 					veh.changeBehavior("separate", [25, true]);
