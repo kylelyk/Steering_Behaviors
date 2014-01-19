@@ -42,7 +42,9 @@ package {
 		private var rand:Object;
 		//private var hitTarget:Boolean;
 		
-		private var textBox:TextField;
+		private var textBox1:TextField;
+		private var textBox2:TextField;
+		
 		private var curDemo:String;
 		private var curIndex:uint = 0;
 		
@@ -78,11 +80,20 @@ package {
 				return;
 			}
 			
-			textBox = new TextField();
+			textBox1 = new TextField();
 			var format:TextFormat = new TextFormat(null, 20, 0x999999, null, null, null, null, null, "center");
-			addChild(textBox);
-			textBox.defaultTextFormat = format;
-			textBox.width = stage.stageWidth;
+			addChild(textBox1);
+			textBox1.defaultTextFormat = format;
+			textBox1.width = stage.stageWidth;
+			
+			textBox2 = new TextField();
+			var format2:TextFormat = new TextFormat(null, 14, 0x999999, null, null, null, null, null, "center");
+			addChild(textBox2);
+			textBox2.defaultTextFormat = format2;
+			textBox2.width = stage.stageWidth;
+			textBox2.y = 25;
+			textBox2.text = "Left and right keys switch behavior, enter key refreshes current behavior.";
+			
 			curDemo = DEMOARRAY[0];
 			switchDemo();
 			leftKey = new OneKeyManager(stage, KeyList.LEFT, null, leftDemo);
@@ -320,7 +331,7 @@ package {
 			}
 			
 			curDemo = DEMOARRAY[curIndex];
-			textBox.text = curDemo + " Behavior";
+			textBox1.text = curDemo + " Behavior";
 			
 			
 			if (curDemo == "SEEK&FLEE") {
