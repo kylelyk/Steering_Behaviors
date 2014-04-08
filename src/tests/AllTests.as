@@ -8,6 +8,12 @@ package tests {
 	public class AllTests extends TestSuite {
 		public function AllTests() {
 			super();
+			
+			//Binary Tree Class Tests (Relies on BinarySearchTree.addData())
+			addTest(new BTTests("TestInorderTraverse"))
+			addTest(new BTTests("TestGetInorderPredessor"))
+			addTest(new BTTests("TestGetInorderSuccessor"))
+			
 			//RedBlackTree Class Tests
 			addTest(new RBTTests("TestAddData"));
             addTest(new RBTTests("TestInOrderTraverse"));

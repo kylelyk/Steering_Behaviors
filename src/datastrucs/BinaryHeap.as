@@ -98,7 +98,7 @@ package datastrucs {
 					rightBetter = -1;
 				}
 				
-				//determine the swapTarget (left, right, or neither)
+				//determine the swapTarget (left, right, or neither) and break if neither
 				if (leftBetter == 1 && rightBetter == 1) {
 					//esentially XNOR + 1
 					swapTarget = 2 - (int(_maxHeap) ^ _compFunction(_elements[2 * index + 1], _elements[2 * index + 2]));

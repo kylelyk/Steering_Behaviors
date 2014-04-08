@@ -2,7 +2,7 @@ package datastrucs {
 	import datastrucs.BinaryTreeNode;
 	
 	/**
-	 * Base class for any type of Binary Tree.
+	 * Base class for any type of Binary Tree. If you're looking for where sibling, uncle, or grandparent getters are defined, that is in BinaryTreeNode.as
 	 *
 	 * @author Kyle Howell
 	 */
@@ -48,6 +48,58 @@ package datastrucs {
 			}
 		}
 		
+		//before
+		public function getInorderPredessor(data:*):* {
+			var node:BinaryTreeNode = getNode(data);
+			if (!node) {
+				return null;
+			}
+			var cursor:BinaryTreeNode = node;
+			
+			if (!node.left) {
+				//no left child so predessor is closest ancestor such that 
+				//node is decended from the right child of the ancestor
+				while (cursor.parent) {
+					if (cursor.parent.right == cursor) {
+						return cursor.parent.data;
+					}
+					cursor = cursor.parent;
+				}
+				return null;
+			} else {
+				//left child so predessor is rightmost descendent
+				cursor = node.left;
+				while (cursor.right) {
+					cursor = cursor.right;
+				}
+				return cursor.data;
+			}
+		}
+		
+		//after
+		public function getInorderSuccessor(data:*):* {
+			var node:BinaryTreeNode = getNode(data);
+			if (!node) {
+				return null;
+			}
+			var cursor:BinaryTreeNode = node;
+			if (!node.right) {
+				while (cursor.parent) {
+					if (cursor.parent.left == cursor) {
+						return cursor.parent.data;
+					}
+					cursor = cursor.parent;
+				}
+				return null;
+			} else {
+				cursor = node.right;
+				while (cursor.left) {
+					cursor = cursor.left;
+				}
+				return cursor.data;
+			}
+		}
+		
 		/**
 		 * Finds the specified data object in the tree.
 		 *
@@ -75,16 +127,16 @@ package datastrucs {
 				//found it
 				if (cursor.data == data) {
 					return cursor;
-				//less than
-				}else if (_compFunction(data, cursor.data)) {
+						//less than
+				} else if (_compFunction(data, cursor.data)) {
 					cursor = cursor.left;
-				//more than or equal to
+						//more than or equal to
 				} else {
 					cursor = cursor.right;
 				}
 			}
 			return null;
-		} 
+		}
 		
 		/**
 		 * Helper function that removes all references to the node so that it can be removed from the tree and garbage collected.

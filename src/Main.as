@@ -49,7 +49,7 @@ package {
 		private var curIndex:uint = 0;
 		
 		//TURN THIS ON FOR AUTOMATIC TESTING
-		private const TESTING:Boolean = false;
+		private const TESTING:Boolean = true;
 		
 		//private const DEMO:String = "SEEK&FLEE";
 		//private const DEMO:String = "WANDER";
@@ -137,6 +137,7 @@ package {
 			//linkedList.pop()
 			//linkedList.unshift("a","s","d","f")
 			//trace(linkedList);
+			
 			//trace(linkedList.convertToArray())
 		
 			//var line1:Line = new Line(new Point(0, 0), new Point(100, 100))

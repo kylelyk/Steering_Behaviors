@@ -118,6 +118,7 @@ package tests {
 				_list = new Array();
 				_list = _instance.query(rect);
 				
+				//Make a list of objects which do overlap rect
 				var refList:Array = new Array();
 				for (var j:uint = 0; j < num; j++) {
 					if (rect.left <= allElements[j].rect.right && allElements[j].rect.left <= rect.right && rect.top <= allElements[j].rect.bottom && allElements[j].rect.top <= rect.bottom) {

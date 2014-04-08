@@ -77,7 +77,7 @@ package tests {
 			}
 		}
 		
-		//Adds nodes such that rearrangements/rotations do not occur (not trying to test addData)
+		//Adds nodes such that the resulting tree is balanced
 		//Will not work without:
 		//addData()
 		public function TestContainsData():void {

@@ -1,4 +1,4 @@
-package datastrucs{
+package datastrucs {
 	
 	/**
 	 * Dynamic node class that can be in any type of binary search tree.
@@ -21,21 +21,21 @@ package datastrucs{
 		public function toString():String {
 			var string:String = "";
 			if (!parent) {
-				string += "null  , ";
+				string += "P:null, ";
 			} else {
-				string += "[NODE], ";
+				string += "P:[NODE], ";
 			}
 			
 			if (!left) {
-				string += String(data) + ", null  , ";
+				string += "D:" + String(data) + ", L:null  , ";
 			} else {
-				string += String(data) + ", [NODE], ";
+				string += "D:" + String(data) + ", L:[NODE], ";
 			}
 			
 			if (!right) {
-				string += "null";
+				string += "R:null";
 			} else {
-				string += "[NODE]";
+				string += "R:[NODE]";
 			}
 			return string
 		}
